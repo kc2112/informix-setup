@@ -55,6 +55,50 @@ DATABASE=mydb;HOSTNAME=localhost;PORT=9089;PROTOCOL=TCPIP;UID=myappuser;PWD=MySe
 - User: `informix`
 - Password: `in4mix`
 
+## Connecting with DBeaver
+
+DBeaver can connect to the container using the DRDA port (9089).
+
+### Prerequisites
+- Container is running and healthy (`docker compose up -d`).
+- You know the values from your `.env` (or use the defaults).
+
+### Steps
+
+1. In DBeaver: **Database → New Database Connection**.
+2. Search for **Informix**. If it is not listed, choose **DB2** (the IBM DB2 JDBC driver speaks DRDA and works with Informix).
+3. If prompted to download a driver, accept the Informix JDBC or IBM DB2 driver.
+4. Enter the connection details:
+
+   | Field | Value |
+   |-------|--------|
+   | Host | `localhost` |
+   | Port | `9089` |
+   | Database | value of `INFORMIX_DATABASE` (default `mydb`) |
+   | Username | value of `INFORMIX_USER` (default `myappuser`) |
+   | Password | value of `INFORMIX_PASSWORD` |
+
+5. Click **Test Connection**. If it succeeds, finish the wizard.
+
+### JDBC URL (optional)
+
+If DBeaver asks for a URL you can use either:
+
+```
+jdbc:informix-sqli://localhost:9089/mydb:INFORMIXSERVER=informix
+```
+
+or (DB2 driver):
+
+```
+jdbc:db2://localhost:9089/mydb
+```
+
+### Notes
+- Always use port **9089** (DRDA), not 9088.
+- The built-in account `informix` / `in4mix` also works if the custom user has not been created yet.
+- After connecting you should see the tables created by `init/seed.sql` (`customers`, `products`, `orders`, `order_items`).
+
 ## TypeScript Tests
 
 The `tests/` directory contains a Jest + TypeScript suite (`informix.test.ts`) that connects to the running Informix instance with the `ibm_db` driver and verifies the data created by `init/seed.sql`.
