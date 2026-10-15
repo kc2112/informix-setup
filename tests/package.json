@@ -3,6 +3,12 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node src/init.ts",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down",
+    "docker:restart": "docker compose restart",
     "test": "jest --runInBand",
     "test:watch": "jest --watch --runInBand",
     "test:ci": "jest --runInBand --ci --coverage"
@@ -12,6 +18,7 @@
     "@types/node": "^20.14.0",
     "jest": "^29.7.0",
     "ts-jest": "^29.1.5",
+    "ts-node": "^10.9.2",
     "typescript": "^5.4.5"
   },
   "dependencies": {

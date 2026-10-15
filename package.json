@@ -1,0 +1,20 @@
+{
+  "name": "informix-setup",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/init.js",
+    "dev": "dotenv -e .env.local -- ts-node src/init.ts",
+    "test": "dotenv -e .env.test -- npm test --prefix tests",
+    "test:ci": "dotenv -e .env.test -- npm run test:ci --prefix tests",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "dotenv-cli": "^7.4.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.5"
+  }
+}
