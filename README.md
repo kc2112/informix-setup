@@ -57,37 +57,26 @@ DATABASE=mydb;HOSTNAME=localhost;PORT=9088;PROTOCOL=TCPIP;UID=informix;PWD=in4mi
 
 ## Connecting with DBeaver
 
-DBeaver connects using the SQLI port (9088). The database locale is `en_US.819`.
+External connections from DBeaver (Windows / Docker Desktop) work with the settings below.
 
-### Prerequisites
-- Container is running and healthy (`docker compose up -d`).
-- Port 9088 is listening.
+### Working connection settings
 
-### Steps
+| Field | Value |
+|-------|--------|
+| Host | `127.0.0.1` |
+| Port | `9088` |
+| Server | `informix` |
+| Database | `mydb` (or value of `INFORMIX_DATABASE`) |
+| Username | `informix` |
+| Password | `in4mix` |
 
-1. In DBeaver: **Database → New Database Connection**.
-2. Search for **Informix**.
-3. If prompted to download a driver, accept the Informix JDBC driver.
-4. Enter the connection details:
+### Driver properties (required)
 
-   | Field | Value |
-   |-------|--------|
-   | Host | `127.0.0.1` |
-   | Port | `9088` |
-   | Server | `informix` |
-   | Database | `mydb` (or value of `INFORMIX_DATABASE`) |
-   | Username | `informix` |
-   | Password | `in4mix` |
-
-5. On the **Driver properties** tab set:
-
-   | Property | Value |
-   |----------|--------|
-   | `INFORMIXSERVER` | `informix` |
-   | `DB_LOCALE` | `en_US.819` |
-   | `CLIENT_LOCALE` | `en_US.819` |
-
-6. Click **Test Connection**.
+| Property | Value |
+|----------|--------|
+| `INFORMIXSERVER` | `informix` |
+| `DB_LOCALE` | `en_US.819` |
+| `CLIENT_LOCALE` | `en_US.819` |
 
 ### JDBC URL
 
@@ -95,10 +84,20 @@ DBeaver connects using the SQLI port (9088). The database locale is `en_US.819`.
 jdbc:informix-sqli://127.0.0.1:9088/mydb:INFORMIXSERVER=informix;DB_LOCALE=en_US.819;CLIENT_LOCALE=en_US.819
 ```
 
+### Steps
+
+1. In DBeaver: **Database → New Database Connection**.
+2. Search for **Informix** and select it.
+3. Download the Informix JDBC driver if prompted.
+4. Enter the values from the table above.
+5. Open the **Driver properties** tab and set `DB_LOCALE` and `CLIENT_LOCALE` to `en_US.819`.
+6. Click **Test Connection**.
+
 ### Notes
-- Use port **9088** (SQLI). Port 9089 (DRDA) is not started by default.
+
+- Use port **9088** (SQLI). Port 9089 is not started by default.
 - Locale must be `en_US.819` to match the database (created with the default ISO-8859-1 locale).
-- Custom OS users are not created by the official image; use `informix` / `in4mix`.
+- Use the built-in account `informix` / `in4mix`. Custom OS users are not created by the official image.
 
 ## TypeScript Tests
 
@@ -184,8 +183,9 @@ docker compose down -v
 
 - Uses the official image: `icr.io/informix/informix-developer-database:latest`
 - The `RUN_FILE_POST_INIT` mechanism runs `init/post_init.sh` after the Informix server finishes initialization.
-- That script creates the OS user, sets the password from `.env`, creates the database named in `.env`, grants DBA privileges, and runs `init/seed.sql`.
+- That script creates the database named in `.env` and runs `init/seed.sql`.
 - Data is stored in the named Docker volume `informix-data`.
+- External clients (including DBeaver) connect on port 9088 with locale `en_US.819` using the built-in `informix` / `in4mix` account.
 
 ## Notes
 
