@@ -1,0 +1,34 @@
+services:
+  informix:
+    image: icr.io/informix/informix-developer-database:latest
+    container_name: informix-dev
+    hostname: informix
+    privileged: true
+    env_file:
+      - .env
+    environment:
+      LICENSE: accept
+      SIZE: ${INFORMIX_SIZE:-small}
+      TYPE: ${INFORMIX_TYPE:-oltp}
+      # Runs after Informix initialization to create custom user/db
+      RUN_FILE_POST_INIT: post_init.sh
+    ports:
+      - "9088:9088"   # SQLI (native Informix protocol)
+      - "9089:9089"   # DRDA (used by ibm_db / JDBC)
+      - "27017:27017" # Mongo wire protocol
+      - "27018:27018" # REST listener
+    volumes:
+      # Mount so the image can execute the post-init script
+      - ./init:/opt/ibm/config
+      # Persist database data
+      - informix-data:/opt/ibm/data
+    healthcheck:
+      test: ["CMD", "onstat", "-"]
+      interval: 15s
+      timeout: 10s
+      retries: 30
+      start_period: 90s
+    restart: unless-stopped
+
+volumes:
+  informix-data:
