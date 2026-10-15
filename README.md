@@ -48,56 +48,57 @@ The file `init/seed.sql` is executed automatically by `init/post_init.sh` after 
 
 **Example connection string (Node.js with `ibm_db`):**
 ```
-DATABASE=mydb;HOSTNAME=localhost;PORT=9089;PROTOCOL=TCPIP;UID=myappuser;PWD=MySecurePassword123;AUTHENTICATION=SERVER;
+DATABASE=mydb;HOSTNAME=localhost;PORT=9088;PROTOCOL=TCPIP;UID=informix;PWD=in4mix;AUTHENTICATION=SERVER;DB_LOCALE=en_US.819;CLIENT_LOCALE=en_US.819;
 ```
 
-**Default built-in account** (still available):
+**Default built-in account** (recommended):
 - User: `informix`
 - Password: `in4mix`
 
 ## Connecting with DBeaver
 
-DBeaver can connect to the container using the DRDA port (9089).
+DBeaver connects using the SQLI port (9088). The database locale is `en_US.819`.
 
 ### Prerequisites
 - Container is running and healthy (`docker compose up -d`).
-- You know the values from your `.env` (or use the defaults).
+- Port 9088 is listening.
 
 ### Steps
 
 1. In DBeaver: **Database → New Database Connection**.
-2. Search for **Informix**. If it is not listed, choose **DB2** (the IBM DB2 JDBC driver speaks DRDA and works with Informix).
-3. If prompted to download a driver, accept the Informix JDBC or IBM DB2 driver.
+2. Search for **Informix**.
+3. If prompted to download a driver, accept the Informix JDBC driver.
 4. Enter the connection details:
 
    | Field | Value |
    |-------|--------|
-   | Host | `localhost` |
-   | Port | `9089` |
-   | Database | value of `INFORMIX_DATABASE` (default `mydb`) |
-   | Username | value of `INFORMIX_USER` (default `myappuser`) |
-   | Password | value of `INFORMIX_PASSWORD` |
+   | Host | `127.0.0.1` |
+   | Port | `9088` |
+   | Server | `informix` |
+   | Database | `mydb` (or value of `INFORMIX_DATABASE`) |
+   | Username | `informix` |
+   | Password | `in4mix` |
 
-5. Click **Test Connection**. If it succeeds, finish the wizard.
+5. On the **Driver properties** tab set:
 
-### JDBC URL (optional)
+   | Property | Value |
+   |----------|--------|
+   | `INFORMIXSERVER` | `informix` |
+   | `DB_LOCALE` | `en_US.819` |
+   | `CLIENT_LOCALE` | `en_US.819` |
 
-If DBeaver asks for a URL you can use either:
+6. Click **Test Connection**.
+
+### JDBC URL
 
 ```
-jdbc:informix-sqli://localhost:9089/mydb:INFORMIXSERVER=informix
-```
-
-or (DB2 driver):
-
-```
-jdbc:db2://localhost:9089/mydb
+jdbc:informix-sqli://127.0.0.1:9088/mydb:INFORMIXSERVER=informix;DB_LOCALE=en_US.819;CLIENT_LOCALE=en_US.819
 ```
 
 ### Notes
-- Always use port **9089** (DRDA), not 9088.
-- The built-in account `informix` / `in4mix` also works if the custom user has not been created yet.
-- After connecting you should see the tables created by `init/seed.sql` (`customers`, `products`, `orders`, `order_items`).
+- Use port **9088** (SQLI). Port 9089 (DRDA) is not started by default.
+- Locale must be `en_US.819` to match the database (created with the default ISO-8859-1 locale).
+- Custom OS users are not created by the official image; use `informix` / `in4mix`.
 
 ## TypeScript Tests
 
@@ -133,24 +134,25 @@ npm run test:ci     # CI mode with coverage report
 
 ### Connection configuration
 
-The tests build a connection string from environment variables (or fall back to the defaults that match `.env`):
+The tests build a connection string from environment variables (or fall back to the defaults that match the working configuration):
 
 - `INFORMIX_DATABASE` (default: `mydb`)
 - `INFORMIX_HOST` (default: `localhost`)
-- `INFORMIX_PORT` (default: `9089`)
-- `INFORMIX_USER` (default: `myappuser`)
-- `INFORMIX_PASSWORD` (default: `MySecurePassword123`)
+- `INFORMIX_PORT` (default: `9088`)
+- `INFORMIX_USER` (default: `informix`)
+- `INFORMIX_PASSWORD` (default: `in4mix`)
+- Locale is fixed to `en_US.819` in the connection string
 
 You can override any of them before running the tests:
 
 ```bash
-INFORMIX_USER=myappuser INFORMIX_PASSWORD=MySecurePassword123 npm test
+INFORMIX_USER=informix INFORMIX_PASSWORD=in4mix npm test
 ```
 
 Or set a full connection string:
 
 ```bash
-INFORMIX_CONN="DATABASE=mydb;HOSTNAME=localhost;PORT=9089;PROTOCOL=TCPIP;UID=myappuser;PWD=MySecurePassword123;AUTHENTICATION=SERVER;" npm test
+INFORMIX_CONN="DATABASE=mydb;HOSTNAME=localhost;PORT=9088;PROTOCOL=TCPIP;UID=informix;PWD=in4mix;AUTHENTICATION=SERVER;DB_LOCALE=en_US.819;CLIENT_LOCALE=en_US.819;" npm test
 ```
 
 ### Troubleshooting

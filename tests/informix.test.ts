@@ -1,7 +1,7 @@
 import * as ibmdb from "ibm_db";
 
 const connectionString = process.env.INFORMIX_CONN
-  ?? `DATABASE=${process.env.INFORMIX_DATABASE ?? "mydb"};HOSTNAME=${process.env.INFORMIX_HOST ?? "localhost"};PORT=${process.env.INFORMIX_PORT ?? "9089"};PROTOCOL=TCPIP;UID=${process.env.INFORMIX_USER ?? "myappuser"};PWD=${process.env.INFORMIX_PASSWORD ?? "MySecurePassword123"};AUTHENTICATION=SERVER;`;
+  ?? `DATABASE=${process.env.INFORMIX_DATABASE ?? "mydb"};HOSTNAME=${process.env.INFORMIX_HOST ?? "localhost"};PORT=${process.env.INFORMIX_PORT ?? "9088"};PROTOCOL=TCPIP;UID=${process.env.INFORMIX_USER ?? "informix"};PWD=${process.env.INFORMIX_PASSWORD ?? "in4mix"};AUTHENTICATION=SERVER;DB_LOCALE=en_US.819;CLIENT_LOCALE=en_US.819;`;
 
 async function query<T = any>(sql: string, params: any[] = []): Promise<T[]> {
   const conn = await ibmdb.open(connectionString);
